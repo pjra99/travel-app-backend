@@ -19,7 +19,11 @@ app.get("/blogs", (req, res) => {
     },
   });
 });
-
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+  });
+});
 app.post("/registeredUsers", (req, res) => {
   const update_registered_users = Object.assign(req.body);
   registered_users.push(update_registered_users);
@@ -58,5 +62,5 @@ app.post("/blogs", (req, res) => {
 
 const port = 8000;
 app.listen(port, () => {
-  console.log("Aur paaji");
+  console.log("Backend chal rha hai");
 });
