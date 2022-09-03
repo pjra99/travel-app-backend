@@ -1,9 +1,33 @@
 const express = require("express");
-const fs = require("fs");
-
 const app = express();
 
+const fs = require("fs");
+// const dotenv = require("dotenv");
+// var mongoose = require("mongoose");
+// dotenv.config({ path: "./config.env" });
+// const DB = process.env.DATABASE;
+
 app.use(express.json());
+
+const cors = require("cors");
+
+const corsOption = {
+  origin: ["http://localhost:3000"],
+};
+app.use(cors(corsOption));
+//if you want in every domain then
+app.use(cors());
+
+// mongoose
+//   .connect(DB, {
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useFindAndModify: false,
+//   })
+//   .then((con) => {
+//     console.log(con.connections);
+//     console.log("DB connection successful!");
+//   });
 
 const blog_content = JSON.parse(
   fs.readFileSync(`${__dirname}/data/blogs.json`)
@@ -11,6 +35,11 @@ const blog_content = JSON.parse(
 const registered_users = JSON.parse(
   fs.readFileSync(`${__dirname}/data/registeredUsers.json`)
 );
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "success",
+  });
+});
 app.get("/blogs", (req, res) => {
   res.status(200).json({
     status: "success",
@@ -19,12 +48,16 @@ app.get("/blogs", (req, res) => {
     },
   });
 });
-app.get("/", (req, res) => {
+app.get("/registeredUsers", (req, res) => {
   res.status(200).json({
     status: "success",
+    data: {
+      registered_users,
+    },
   });
 });
 app.post("/registeredUsers", (req, res) => {
+  // console.log("Yha tk agye");
   const update_registered_users = Object.assign(req.body);
   registered_users.push(update_registered_users);
   fs.writeFile(
@@ -60,7 +93,7 @@ app.post("/blogs", (req, res) => {
   res.send("Done");
 });
 
-const port = 8000;
+const port = process.env.PORT || 8000;
 app.listen(port, () => {
-  console.log("Backend chal rha hai");
+  console.log(`Backend chal rha hai port ${port} par`);
 });
