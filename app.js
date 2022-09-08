@@ -1,12 +1,11 @@
 const express = require("express");
 const app = express();
-
+require("dotenv").config();
 const fs = require("fs");
-// const dotenv = require("dotenv");
-// var mongoose = require("mongoose");
-// dotenv.config({ path: "./config.env" });
-// const DB = process.env.DATABASE;
+var mongoose = require("mongoose");
 
+const DB = process.env.DATABASE;
+console.debug(process.env.DATABASE);
 app.use(express.json());
 
 const cors = require("cors");
@@ -18,16 +17,17 @@ app.use(cors(corsOption));
 //if you want in every domain then
 app.use(cors());
 
-// mongoose
-//   .connect(DB, {
-//     useNewUrlParser: true,
-//     useCreateIndex: true,
-//     useFindAndModify: false,
-//   })
-//   .then((con) => {
-//     console.log(con.connections);
-//     console.log("DB connection successful!");
-//   });
+// console.log(DB);
+mongoose
+  .connect(DB, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
+  })
+  .then((con) => {
+    console.log(con.connections);
+    console.log("DB connection successful!");
+  });
 
 const blog_content = JSON.parse(
   fs.readFileSync(`${__dirname}/data/blogs.json`)
