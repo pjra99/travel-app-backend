@@ -25,15 +25,30 @@ mongoose
     useFindAndModify: false,
   })
   .then((con) => {
-    console.log(con.connections);
+    // console.log(con.connections);
     console.log("DB connection successful!");
   });
 
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+  },
+  email: {
+    type: String,
+    required: [true, "A user must have an email"],
+  },
+  password: {
+    type: String,
+    required: [true, "A user must have a password"],
+  },
+});
+
+const User = mongoose.model("User", userSchema);
 const blog_content = JSON.parse(
   fs.readFileSync(`${__dirname}/data/blogs.json`)
 );
 const registered_users = JSON.parse(
-  fs.readFileSync(`${__dirname}/data/registeredUsers.json`)
+  fs.readFileSync(`${__dirname}/data/users.json`)
 );
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -48,7 +63,7 @@ app.get("/blogs", (req, res) => {
     },
   });
 });
-app.get("/registeredUsers", (req, res) => {
+app.get("/users", (req, res) => {
   res.status(200).json({
     status: "success",
     data: {
@@ -56,22 +71,36 @@ app.get("/registeredUsers", (req, res) => {
     },
   });
 });
-app.post("/registeredUsers", (req, res) => {
+app.post("/users", (req, res) => {
   // console.log("Yha tk agye");
-  const update_registered_users = Object.assign(req.body);
-  registered_users.push(update_registered_users);
-  fs.writeFile(
-    `${__dirname}/data/registeredUsers.json`,
-    JSON.stringify(registered_users),
-    (err = () => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          registered_users: update_registered_users,
-        },
-      });
+  // const update_registered_users = Object.assign(req.body);
+  // registered_users.push(update_registered_users);
+  // fs.writeFile(
+  //   `${__dirname}/data/users.json`,
+  //   JSON.stringify(registered_users),
+  //   (err = () => {
+  //     res.status(201).json({
+  //       status: "success",
+  //       data: {
+  //         registered_users: update_registered_users,
+  //       },
+  //     });
+  //   })
+  // );
+  const testUser = new User({
+    email: `${req.body.data.email}`,
+    password: `${req.body.data.password}`,
+  });
+
+  testUser
+    .save()
+    .then((doc) => {
+      console.log(doc);
     })
-  );
+    .catch((err) => {
+      console.log("Error" + err);
+    });
+
   res.send("Done");
 });
 
@@ -90,38 +119,9 @@ app.post("/blogs", (req, res) => {
       });
     })
   );
+
   res.send("Done");
 });
-
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, "A user must have a name"],
-  },
-  email: {
-    type: String,
-    required: [true, "A user must have an email"],
-  },
-  password: {
-    type: String,
-    required: [true, "A user must have a password"],
-  },
-});
-const User = mongoose.model("User", userSchema);
-const testUser = new User({
-  name: "Pranjal Rai",
-  email: "chachavidhayakhai@gmail.com",
-  password: "lavdekvidhyakhai",
-});
-
-testUser
-  .save()
-  .then((doc) => {
-    console.log(doc);
-  })
-  .catch((err) => {
-    console.log("Error" + err);
-  });
 
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
