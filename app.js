@@ -93,6 +93,36 @@ app.post("/blogs", (req, res) => {
   res.send("Done");
 });
 
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "A user must have a name"],
+  },
+  email: {
+    type: String,
+    required: [true, "A user must have an email"],
+  },
+  password: {
+    type: String,
+    required: [true, "A user must have a password"],
+  },
+});
+const User = mongoose.model("User", userSchema);
+const testUser = new User({
+  name: "Pranjal Rai",
+  email: "chachavidhayakhai@gmail.com",
+  password: "lavdekvidhyakhai",
+});
+
+testUser
+  .save()
+  .then((doc) => {
+    console.log(doc);
+  })
+  .catch((err) => {
+    console.log("Error" + err);
+  });
+
 const port = process.env.PORT || 8000;
 app.listen(port, () => {
   console.log(`Backend chal rha hai port ${port} par`);
