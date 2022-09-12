@@ -20,8 +20,9 @@ app.use(cors());
 // console.log(DB);
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
     useCreateIndex: true,
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
     useFindAndModify: false,
   })
   .then((con) => {
@@ -63,18 +64,22 @@ app.get("/blogs", (req, res) => {
     },
   });
 });
-app.get("/users", (req, res) => {
+
+app.get("/users", async (req, res) => {
+  let all_users = await User.find();
+  console.log(all_users);
   res.status(200).json({
     status: "success",
     data: {
-      registered_users,
+      all_users,
     },
   });
 });
+
 app.post("/users", (req, res) => {
-  // console.log("Yha tk agye");
-  // const update_registered_users = Object.assign(req.body);
-  // registered_users.push(update_registered_users);
+  console.log("Yha tk agye");
+  const update_registered_users = Object.assign(req.body);
+  registered_users.push(update_registered_users);
   // fs.writeFile(
   //   `${__dirname}/data/users.json`,
   //   JSON.stringify(registered_users),
@@ -87,12 +92,12 @@ app.post("/users", (req, res) => {
   //     });
   //   })
   // );
-  const testUser = new User({
+  const user = new User({
     email: `${req.body.data.email}`,
     password: `${req.body.data.password}`,
   });
 
-  testUser
+  user
     .save()
     .then((doc) => {
       console.log(doc);
