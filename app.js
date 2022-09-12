@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
 require("dotenv").config();
-const fs = require("fs");
 var mongoose = require("mongoose");
 
 const DB = process.env.DATABASE;
@@ -17,7 +16,6 @@ app.use(cors(corsOption));
 //if you want in every domain then
 app.use(cors());
 
-// console.log(DB);
 mongoose
   .connect(DB, {
     useCreateIndex: true,
@@ -44,16 +42,51 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+const blogSchema = new mongoose.Schema({
+  blog_title: {
+    type: String,
+    requried: [true, "It must require a password"],
+  },
+  blog_content: {
+    type: String,
+    required: [true, "It must have a content"],
+  },
+  author_name: {
+    type: String,
+    requried: [true, "Author must have a name"],
+  },
+  author_email: {
+    type: String,
+    required: [true, "Author's email is required"],
+  },
+  likes: {
+    type: Number,
+    required: [true, "Number of likes are required"],
+  },
+  upvotes: {
+    type: Number,
+    required: [true, "Number of upvotes is required"],
+  },
+  downvotes: {
+    type: Number,
+    required: [true, "Number of downvotes is required"],
+  },
+  comments: {
+    type: Array,
+    required: [true, "Comments are required"],
+  },
+});
+
+//Schemas
 const User = mongoose.model("User", userSchema);
-const blog_content = JSON.parse(
-  fs.readFileSync(`${__dirname}/data/blogs.json`)
-);
-const registered_users = JSON.parse(
-  fs.readFileSync(`${__dirname}/data/users.json`)
-);
+const Blog = mongoose.model("Blog", blogSchema);
+
 app.get("/", (req, res) => {
   res.status(200).json({
     status: "success",
+  });
+  res.status(404).json({
+    status: "Not Found!",
   });
 });
 app.get("/blogs", (req, res) => {
@@ -80,18 +113,6 @@ app.post("/users", (req, res) => {
   console.log("Yha tk agye");
   const update_registered_users = Object.assign(req.body);
   registered_users.push(update_registered_users);
-  // fs.writeFile(
-  //   `${__dirname}/data/users.json`,
-  //   JSON.stringify(registered_users),
-  //   (err = () => {
-  //     res.status(201).json({
-  //       status: "success",
-  //       data: {
-  //         registered_users: update_registered_users,
-  //       },
-  //     });
-  //   })
-  // );
   const user = new User({
     email: `${req.body.data.email}`,
     password: `${req.body.data.password}`,
@@ -99,12 +120,8 @@ app.post("/users", (req, res) => {
 
   user
     .save()
-    .then((doc) => {
-      console.log(doc);
-    })
-    .catch((err) => {
-      console.log("Error" + err);
-    });
+    .then((doc) => console.log(doc))
+    .catch((err) => console.log("Error" + err));
 
   res.send("Done");
 });
@@ -112,18 +129,21 @@ app.post("/users", (req, res) => {
 app.post("/blogs", (req, res) => {
   const updated_blog_content = Object.assign(req.body);
   blog_content.push(updated_blog_content);
-  fs.writeFile(
-    `${__dirname}/data/blogs.json`,
-    JSON.stringify(blog_content),
-    (err = () => {
-      res.status(201).json({
-        status: "success",
-        data: {
-          blog_content: updated_blog_content,
-        },
-      });
-    })
-  );
+  const blog = new Blog({
+    blog_title: `${req.title}`,
+    blog_content: `${req.blog_content}`,
+    author_name: `${req.author_name}`,
+    author_email: `${req.author_email}`,
+    likes: `${req.likes}`,
+    upvotes: `${req.upvote}`,
+    downvotes: `${req.downvote}`,
+    comments: `${req.comments}`,
+  });
+
+  blog
+    .save()
+    .then((doc) => console.log(doc))
+    .catch((err) => console.log("Error" + err));
 
   res.send("Done");
 });
